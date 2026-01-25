@@ -1,6 +1,6 @@
 ---
 title: 'The Tale of a Cat and a Dog - Part I'
-date: 2026-01-20 13:00:00
+date: 2026-01-26
 categories: [Software Development, Utils]
 tags: [python, cli, cat, coreutils, pyutils, unix, linux]
 ---
@@ -85,10 +85,72 @@ The description states that this option can be used to number non empty lines, m
 It will also disable/override the functionality enabled by `-n` option, if such option is set. 
 I'll jump a little bit ahead and say that `-n` enumerates and displays line numbers for the complete output.
 
+```terminal
+❯ cat -b ./test_file.txt 
+     1	This is a normal line.
+
+     2	This line has trailing spaces.    
+     3	(Ends with 4 spaces)
+
+
+
+
+     4	These were multiple blank lines above.
+
+     5	Line with a TAB →	    after the tab.
+
+     6	Line with Unicode: ąčęž漢字🙂
+
+     7	Line with raw control chars:
+     8	BEL: 
+     9	BS: 
+    10	ESC: 
+1	DEL: 
+
+    12	Null byte in text:
+    13	Here → � ← there
+
+    14	A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+    15	Line without newline at end → END_OF_FILE
+
+```
+
 #### cat -E / --show-ends
 
 This option simply puts the `"$"` character at the end of each line. 
 This can be useful in certain scenarios like when dealing with non-printing characters so that end of line is easier to spot in the output.
+
+```terminal
+❯ cat -E test_file.txt                     
+This is a normal line.$
+$
+This line has trailing spaces.    $
+(Ends with 4 spaces)$
+$
+$
+$
+$
+These were multiple blank lines above.$
+$
+Line with a TAB →	    after the tab.$
+$
+Line with Unicode: ąčęž漢字🙂$
+$
+Line with raw control chars:$
+BEL: $
+BS:$
+ESC: 
+EL: $
+$
+Null byte in text:$
+Here → � ← there$
+$
+A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA$
+$
+Line without newline at end → END_OF_FILE$
+
+```
 
 #### cat -n / --number
 
@@ -98,15 +160,106 @@ As I already mentioned:
 
 In other words, cat will print line numbers even for empty lines.
 
+```terminal
+❯ cat -n test_file.txt
+     1	This is a normal line.
+     2	
+     3	This line has trailing spaces.    
+     4	(Ends with 4 spaces)
+     5	
+     6	
+     7	
+     8	
+     9	These were multiple blank lines above.
+    10	
+    11	Line with a TAB →	    after the tab.
+    12	
+    13	Line with Unicode: ąčęž漢字🙂
+    14	
+    15	Line with raw control chars:
+    16	BEL: 
+    17	BS: 
+    18	ESC: 
+9	DEL: 
+    20	
+    21	Null byte in text:
+    22	Here → � ← there
+    23	
+    24	A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    25	
+    26	Line without newline at end → END_OF_FILE
+```
+
 #### cat -s / --squeeze-blank
 
 In cases when the input contains two or more consecutive blank lines the `-s` or `--squeeze-blank` 
 option can be used to merge / squash / squeeze them into a single line to not waste the precious screen space.
 
+```terminal
+❯ cat -s test_file.txt
+This is a normal line.
+
+This line has trailing spaces.    
+(Ends with 4 spaces)
+
+These were multiple blank lines above.
+
+Line with a TAB →	    after the tab.
+
+Line with Unicode: ąčęž漢字🙂
+
+Line with raw control chars:
+BEL: 
+BS: 
+ESC: 
+
+EL: 
+
+Null byte in text:
+Here → � ← there
+
+A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Line without newline at end → END_OF_FILE
+
+```
+
 #### cat -T / --show-tabs
 
 The name of this option is explanatory enough. Whenever cat encounters a `TAB` character, 
 instead of indenting the remainder of the text it will simply output `"^I"` instead.
+
+```terminal
+ cat -T test_file.txt
+This is a normal line.
+
+This line has trailing spaces.    
+(Ends with 4 spaces)
+
+
+
+
+These were multiple blank lines above.
+
+Line with a TAB →^I    after the tab.
+
+Line with Unicode: ąčęž漢字🙂
+
+Line with raw control chars:
+BEL: 
+BS: 
+ESC: 
+
+EL: 
+
+Null byte in text:
+Here → � ← there
+
+A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Line without newline at end → END_OF_FILE
+
+```
 
 #### cat -v / --show-nonprinting
 
@@ -119,17 +272,91 @@ This one I find the most interesting as it handles non-printing characters in a 
 
 Characters with high-bit (`0x80`) set will be printed in meta notation (`M-`) if the option for non-printing characters is set.
 
+
+```terminal
+❯ cat -v test_file.txt              
+This is a normal line.
+
+This line has trailing spaces.    
+(Ends with 4 spaces)
+
+
+
+
+These were multiple blank lines above.
+
+Line with a TAB M-bM-^FM-^R	    after the tab.
+
+Line with Unicode: M-DM-^EM-DM-^MM-DM-^YM-EM->M-fM-<M-"M-eM--M-^WM-pM-^_M-^YM-^B
+
+Line with raw control chars:
+BEL: ^G
+BS: ^H
+ESC: ^[
+DEL: ^?
+
+Null byte in text:
+Here M-bM-^FM-^R M-oM-?M-= M-bM-^FM-^P there
+
+A very long line for chunk-reading testing: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Line without newline at end M-bM-^FM-^R END_OF_FILE
+
+```
+
 #### cat --help
 
 Prints the help section which explains the usage and all the supported options.
+
+```terminal
+❯ cat --help          
+Usage: cat [OPTION]... [FILE]...
+Concatenate FILE(s) to standard output.
+
+With no FILE, or when FILE is -, read standard input.
+
+  -A, --show-all           equivalent to -vET
+  -b, --number-nonblank    number nonempty output lines, overrides -n
+  -e                       equivalent to -vE
+  -E, --show-ends          display $ at end of each line
+  -n, --number             number all output lines
+  -s, --squeeze-blank      suppress repeated empty output lines
+  -t                       equivalent to -vT
+  -T, --show-tabs          display TAB characters as ^I
+  -u                       (ignored)
+  -v, --show-nonprinting   use ^ and M- notation, except for LFD and TAB
+      --help        display this help and exit
+      --version     output version information and exit
+
+Examples:
+  cat f - g  Output f's contents, then standard input, then g's contents.
+  cat        Copy standard input to standard output.
+
+GNU coreutils online help: <https://www.gnu.org/software/coreutils/>
+Full documentation <https://www.gnu.org/software/coreutils/cat>
+or available locally via: info '(coreutils) cat invocation'
+
+
+```
 
 #### cat --version
 
 This option will print some standard information about current utility version, authors and similar.
 
-#### Compounds options
+```terminal
+❯ cat --version                                   
+cat (GNU coreutils) 9.7
+Copyright (C) 2025 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
-Now we come back to the compund options that represent a combination of other options. 
+Written by Torbjörn Granlund and Richard M. Stallman.
+```
+
+#### Compound options
+
+Now we come back to the compound options that represent a combination of other options. 
 
 - `-A` / `--show-all option` - Starting with `-A` / `--show-all option`, it gives the user a possibility to enable functionalities provided by options: `-v`, `-E`, `-T`. 
 In other words this option will output file contents in such way that `"$"` signs are printed for line endings combined with `"^I"` 
@@ -141,8 +368,8 @@ as a replacement for `TAB` characters. It will also print the non-printing chara
 
 ## Conclusion
 
-In this first part of the blog an overview of the `cat` command was given with explanations for each of the supported options.
-In the second part I'll explain one way how to implement this utility by going through the implementation details of my own `cat` clone - `dog`.
+This first part of the blog gives an overview of the `cat` command with explanations for each of the supported options.
+The second part will explain one way on how to implement this utility by going through the implementation details of my own `cat` clone - `dog`.
 
 Stay tuned ...
 
