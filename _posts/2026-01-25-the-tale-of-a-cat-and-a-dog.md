@@ -3,6 +3,7 @@ title: 'The Tale of a Cat and a Dog - Part I'
 date: 2026-01-25
 categories: [Software Development, Utils]
 tags: [python, cli, cat, coreutils, pyutils, unix, linux]
+description: Learn the details behind the cat utility.
 ---
 
 ## Introduction
