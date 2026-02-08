@@ -1,0 +1,32 @@
+@startuml
+
+allowmixing
+
+!theme cerulean
+
+package "dog" as dogpack {
+    component "dog" as dogcomp
+}
+
+package "cli" {
+    component config
+    component parser
+}
+
+package "core" {
+    component processor
+    component transformers
+}
+
+package "util" as utilpack {
+    component "util" as utilcomp
+}
+
+dogcomp --> config
+dogcomp --> parser
+dogcomp --> processor
+dogcomp --> utilcomp
+
+processor --> transformers
+
+@enduml
