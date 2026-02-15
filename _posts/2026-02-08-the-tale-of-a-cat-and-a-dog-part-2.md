@@ -170,7 +170,75 @@ def parse_args() -> argparse.Namespace:
 
 ### Dog Configuration
 
+Once the arguments are parsed they can be simply accessed as:
+
+```python
+import cli.parser
+
+args = parser.parse_args()
+
+if args.show_tabs or args.t or args.show_all:
+    # format the output sequence to show tabs as ^I symbols.
+elif args.show_ends or args.show_all or args.e:
+    # format the output sequence to show $ as line endings.
+...
+
+```
+
+Since certain output formatting options can be enabled by more than one argument, existence of each of these arguments needs to be verified to determine if the option should be enabled or not. Like in the snippet above, to determine if tabs should be visible in the output or not, all three arguments which enable the option need to be checked: `show_tabs`, `t` and `show_all`. This approach is cumbersome and negatively affects code readability and comprehension. 
+
+This can be simplified a bit which is where the `DogConfig` comes in. 
+
+`DogConfig` is a class provided by the `cli.config` submodule. It serves as a convenient abstraction on top of the parsed arguments and it holds the overall configuration of the currently executing program. By using `DogConfig`, the existence verification of each argument is abstracted into a set of well-defined methods. 
+
+For the same example, instead of explictly checking for the existence of `show_tabs`, `t` and `show_all` arguments at once, these checks are moved into the `show_tabs` method which returns a boolean if either of the arguments is set. Internally, the same parameters are still used, but the resulting user code is simpler and more readable. 
+
+```python
+def show_tabs(self) -> bool:
+    """ Specifies if tabs should be shown in processed output text.
+
+    Tabs should be shown if any of following arguments are set:
+        --show-tabs, -T
+        --show-all, -A
+        -t
+
+    Returns:
+        bool: True if tabs should be shown, false otherwise.
+    """
+
+    return self.args.show_tabs or \
+           self.args.t or \
+           self.args.show_all
+```
+
+Other verifications follow the same pattern:
+
+```python
+def show_ends(self) -> bool:
+    """ Specifies if end of line should be shown in processed output text.
+
+    End of line characters should be shown if any of following arguments are set:
+        --show-ends, -E
+        --show-all, -A
+        -e
+
+    Returns:
+        bool: True if end of line should be shown, false otherwise.
+    """
+
+    return self.args.show_ends or \
+           self.args.show_all or \
+           self.args.e
+```
+
 ### Input Reading
+
+The application can now parse the command-line arguments and create the runtime configuration based on them. The configuration only makes sense if it can be applied on some input. 
+
+There are two primary sources of input data for the application:
+
+1. The standard input - `stdin`.
+2. File input.
 
 #### Reading From The Standard Input
 
