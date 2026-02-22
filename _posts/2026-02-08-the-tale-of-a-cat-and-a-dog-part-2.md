@@ -50,6 +50,7 @@ Parsing of command-line arguments is the responsibility of the `parser` submodul
 The parser is created as:
 
 ```python
+import argparse
 
 def _create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="dog",
@@ -85,6 +86,7 @@ To realize the needed functionality only the following ones are used:
 The arguments are statically defined as specified by the requirements:
 
 ```python
+import argparse
 
 def _create_parser() -> argparse.ArgumentParser:
     ...
@@ -261,9 +263,13 @@ For both sources the data is read in binary mode and processed as a sequence of 
 Standard input is read if no `FILE` argument is set or when it is set to "-". To read from `stdin`, it's internal buffer is accessed and read line by line. Data is then processed as required by the  configuration and written to standard output - `stdout`.
 
 ```python
+import cli.config as dc
+import core.processor as dp
+import utils.utils as du
+
 def read_stdin(dog_config: dc.DogConfig, line_tracker: du.LineTracker) -> None:
     while (data := sys.stdin.buffer.readline()):
-        processed_data = ddp.process_data(data, dog_config)
+        processed_data = dp.process_data(data, dog_config)
         du.write_stdout(du.format_line(processed_data, dog_config, line_tracker))
 ```
 
@@ -272,13 +278,16 @@ def read_stdin(dog_config: dc.DogConfig, line_tracker: du.LineTracker) -> None:
 The data is read and processed for each file stored in the `FILE` argument. It is read in chunks of 256 bytes which makes the file reading memory efficient as the whole file is not loaded into the memory at once. If any argument such as `--squeeze-blank`, `--number` or `--number-nonblank` is enabled then the data is buffered until end of line (EOL) is detected. Only when EOL is detected the buffered data is formatted based on the configuration (lines enumerated, repeating empty lines removed...) and written to stdout.
 
 ```python
+import cli.config as dc
+import core.processor as dp
+import utils.utils as du
 
 def read_file(filename: str, dog_config: dc.DogConfig, line_tracker: du.LineTracker) -> None:
     chunk_size = 256
     with open(filename, "rb") as file:
         buffered_data = bytearray()
         while (data_chunk := file.read(chunk_size)) != b"":
-            processed_data = ddp.process_data(data_chunk, dog_config)
+            processed_data = dp.process_data(data_chunk, dog_config)
             if du.track_end_of_line(dog_config):
                 buffered_data += processed_data
                 if b"\n" in buffered_data:
@@ -292,6 +301,11 @@ def read_file(filename: str, dog_config: dc.DogConfig, line_tracker: du.LineTrac
 So far we've seen how the application parses the command-line arguments, how it creates the runtime configuration based on them and how it reads the data from standard input and/or one or more files.
 
 ```python
+
+import cli.config as dc
+import cli.parser as dp
+import utils.utils as du
+
 def run_dog():
     """
         Function which executes the dog utility
@@ -321,6 +335,9 @@ Data classification and processing are performed by the `processor` submodule. E
 The `process_data` function implements the algorithm shown above:
 
 ```python
+import cli.config as dc
+import core.transformers as dt
+
 def process_data(data: bytes, dog_config: dc.DogConfig) -> bytearray:
     data_it = 0
     processed_data= bytearray()
@@ -354,6 +371,8 @@ def transform_alphanum_character(code: int) -> bytes:
 The newline character could essentially be classified as a control character but it is classified into own character class for easier manipulation. The `transform_newline_character` function first checks if end of line symbols were requested by the configuration. If they were then the special "$" symbol is prepended to the newline character. Otherwise the newline is treated as a regular end of line character.
 
 ```python
+import cli.config as dc
+
 def transform_newline_character(dog_config: dc.DogConfig) -> bytes:
     if dog_config.show_ends():
         return b"$\n"
@@ -368,6 +387,8 @@ The control characters are transformed as follows:
 - If none of the above is matched the character is returned as is.
 
 ```python
+import cli.config as dc
+
 def transform_control_character(code: int, dog_config: dc.DogConfig) -> bytes:
     if code == ord("\t"):
         if dog_config.show_tabs():
@@ -389,6 +410,8 @@ def transform_control_character(code: int, dog_config: dc.DogConfig) -> bytes:
 The final transformation function is the one which transforms any non-ASCII character. All non-printing characters are part of this character class and they're only displayed in the output in a meta-notation if the `show-nonprinting` command-line argument is set.
 
 ```python
+import cli.config as dc
+
 def transform_non_ascii_character(code: int, dog_config: dc.DogConfig) -> bytes:
     if dog_config.show_nonprinting():
         return du.to_meta_notation(code).encode("ascii")
