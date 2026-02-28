@@ -1,0 +1,25 @@
+@startuml
+
+!pragma useVerticalIf on
+
+!theme cerulean
+
+start
+:Read input data;
+
+while (All data processed?) is (No)
+:Process data;
+if (Is newline character?) then (Yes)
+    :Transform newline character;
+(No) elseif (Is alphanumeric character?) then (Yes)
+    :Transform alphanumeric character;
+(No) elseif (Is control character?) then (Yes)
+    :Transform control character;
+else (No)
+    :Transform non-ASCII character;
+endif
+endwhile (Yes)
+:Write to stdout;
+stop
+
+@enduml
