@@ -1,6 +1,6 @@
 ---
 title: 'The Tale of a Cat and a Dog - Part II'
-date: 2026-02-08
+date: 2026-02-28
 categories: [Software Development, Utils]
 tags: [python, cli, cat, coreutils, pyutils, unix, linux]
 description: Learn the implementation details of - the dog - a simple cat clone written in Python.
