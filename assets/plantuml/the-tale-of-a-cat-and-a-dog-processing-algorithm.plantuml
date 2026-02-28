@@ -6,10 +6,9 @@
 
 start
 :Read input data;
-:Process data;
 
 while (All data processed?) is (No)
-:Process byte;
+:Process data;
 if (Is newline character?) then (Yes)
     :Transform newline character;
 (No) elseif (Is alphanumeric character?) then (Yes)
